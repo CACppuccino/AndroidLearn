@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">androidLearn</string>
+    <string name="letter">empty letter</string>
+    <string name="btn1">go the menu</string>
+    <string name="email">email:</string>
+    <string name="company">company:</string>
+
+    <!--<string name="user_avatar"></string>-->
+    <string name="title_activity_welcome">WelcomeActivity</string>
+    <!--<string name="dummy_button">Dummy Button</string>-->
+    <!--<string name="dummy_content">DUMMY\nCONTENT</string>-->
+</resources>
