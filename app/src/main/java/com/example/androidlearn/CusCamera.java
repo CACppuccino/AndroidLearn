@@ -127,8 +127,7 @@ public class CusCamera extends AppCompatActivity {
             Log.d(TAG, "Error creating media file, check storage permissions: " );
             return;
         }
-
-
+        
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(tmpdata);
@@ -136,7 +135,7 @@ public class CusCamera extends AppCompatActivity {
             Log.e(TAG,"write photo success!");
             Toast.makeText(CusCamera.this, "photo saved!",Toast.LENGTH_LONG)
                     .show();
-            finish();
+            mCamera.startPreview();
         } catch (FileNotFoundException e) {
             Log.d(TAG, "File not found: " + e.getMessage());
         } catch (IOException e) {
@@ -157,8 +156,11 @@ public class CusCamera extends AppCompatActivity {
         public void onPictureTaken(byte[] data, Camera camera) {
 
             tmpdata = data;
+            // stop the preview
+            mCamera.stopPreview();
             Toast.makeText(CusCamera.this,"Save this photo XD?",Toast.LENGTH_LONG)
                     .show();
+            // create and show the dialog
             confirm = builder.create();
             confirm.show();
             Toast.makeText(CusCamera.this, "builder created", Toast.LENGTH_SHORT)
