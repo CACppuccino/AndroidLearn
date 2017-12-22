@@ -5,15 +5,19 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
+import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.hardware.*;
+import android.hardware.Camera.Parameters;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,26 +29,32 @@ import static com.example.androidlearn.utils.getOutputMediaFile;
 
 public class CusCamera extends AppCompatActivity {
 
-    private int cameraId;
     private Camera mCamera;
+    private Camera.Parameters parameters;
     private camPreview mPreview;
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-    private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 200;
     private String TAG = "output:";
     private boolean touched = false;
     private byte[] tmpdata;
     private AlertDialog confirm;
     private AlertDialog.Builder builder;
+    // normal status
+    static final private int BACK_CAMERA = 0;
+    // self photo
+    static final private int FRONT_CAMERA = 1;
+    static private int CAMERA_STATUS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setView();
-        setListener();
+        // check the existence of the hardware
         if (!checkCamHardware(CusCamera.this)){
             // navigate back to menu automatically
             finish();
         }
+
+        setView();
+        setListener();
+
         builder = new AlertDialog.Builder(CusCamera.this);
         Log.e(TAG,"builder built");
         builder.setMessage(R.string.cam_confirm)
@@ -71,17 +81,21 @@ public class CusCamera extends AppCompatActivity {
         Camera.getCameraInfo(cameraId,cameraInfo);
         return cameraInfo;
     }
-    public static Camera getCameraInstance(){
+
+    public static Camera getCameraInstance(int cam_status){
         Camera c = null;
         try{
-            c = Camera.open();
+            c = Camera.open(cam_status);
+            CAMERA_STATUS = cam_status;
         }catch (Exception e){
             e.printStackTrace();
         }
         return c;
     }
+
     private void setView(){
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // hide the action bar
         getSupportActionBar().hide();
         setContentView(R.layout.activity_cus_camera);
 
@@ -89,18 +103,18 @@ public class CusCamera extends AppCompatActivity {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
         // get a camera instance
-        mCamera = getCameraInstance();
-
+        mCamera = getCameraInstance(BACK_CAMERA);
+        setCameraProperties();
         // Create our Preview and set the content to the activity
         mPreview = new camPreview(CusCamera.this, mCamera);
         FrameLayout preview = findViewById(R.id.camera_preview);
-        Log.e("preview***",preview==null?"is null":"not null");
-
         setCameraDisplayOrientation(CusCamera.this,0,mCamera);
         preview.addView(mPreview);
 
-        // make the button invisible
-
+        // find and add the switch
+//        Switch cam = findViewById(R.id.switch_cam);
+        // start the preview
+        mCamera.startPreview();
     }
 
     private void setListener(){
@@ -116,6 +130,35 @@ public class CusCamera extends AppCompatActivity {
             }
         });
 
+        Switch cam_switch = findViewById(R.id.switch_cam);
+
+        cam_switch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e(TAG, "swiched!");
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = getCameraInstance(CAMERA_STATUS==FRONT_CAMERA?BACK_CAMERA:FRONT_CAMERA);
+                mPreview = new camPreview(CusCamera.this, mCamera);
+                FrameLayout preview = findViewById(R.id.camera_preview);
+                preview.clearChildFocus(mPreview);
+                setCameraDisplayOrientation(CusCamera.this,CAMERA_STATUS,mCamera);
+                preview.addView(mPreview);
+                mCamera.startPreview();
+            }
+        });
+
+    }
+
+    /*
+    * set the cam's parameters
+    * */
+    private void setCameraProperties(){
+        parameters = mCamera.getParameters();
+        parameters.setFocusMode(Parameters.FOCUS_MODE_AUTO);
+        parameters.setPictureFormat(PixelFormat.JPEG);
+        mCamera.setParameters(parameters);
+
     }
 
     /*
@@ -127,13 +170,13 @@ public class CusCamera extends AppCompatActivity {
             Log.d(TAG, "Error creating media file, check storage permissions: " );
             return;
         }
-        
+
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(tmpdata);
             fos.close();
             Log.e(TAG,"write photo success!");
-            Toast.makeText(CusCamera.this, "photo saved!",Toast.LENGTH_LONG)
+            Toast.makeText(CusCamera.this, "photo saved!",Toast.LENGTH_SHORT)
                     .show();
             mCamera.startPreview();
         } catch (FileNotFoundException e) {
@@ -147,7 +190,9 @@ public class CusCamera extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.e(TAG,"released");
+        mCamera.stopPreview();
         mCamera.release();
+
     }
 
     private PictureCallback mPicture = new PictureCallback() {
@@ -158,13 +203,17 @@ public class CusCamera extends AppCompatActivity {
             tmpdata = data;
             // stop the preview
             mCamera.stopPreview();
-            Toast.makeText(CusCamera.this,"Save this photo XD?",Toast.LENGTH_LONG)
-                    .show();
+//            Toast.makeText(CusCamera.this,"Save this photo XD?",Toast.LENGTH_LONG)
+//                    .show();
             // create and show the dialog
             confirm = builder.create();
             confirm.show();
-            Toast.makeText(CusCamera.this, "builder created", Toast.LENGTH_SHORT)
-                .show();
+
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+//            Toast.makeText(CusCamera.this, "builder created", Toast.LENGTH_SHORT)
+//                .show();
         }
     };
 
