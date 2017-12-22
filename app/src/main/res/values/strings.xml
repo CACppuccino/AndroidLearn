@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">androidLearn</string>
+    <string name="app_name">ansDiscovery</string>
     <string name="letter">empty letter</string>
     <string name="btn1">go the menu</string>
     <string name="email">email:</string>
@@ -7,6 +7,25 @@
 
     <!--<string name="user_avatar"></string>-->
     <string name="title_activity_welcome">WelcomeActivity</string>
-    <!--<string name="dummy_button">Dummy Button</string>-->
-    <!--<string name="dummy_content">DUMMY\nCONTENT</string>-->
+
+    <!--menu btn strings-->
+
+    <string name="btn_github">Github Checker</string>
+    <string name="btn_sys_cam">System Camera</string>
+    <string name="btn_toFlip">Flip View</string>
+    <string name="btn_toCusCam">Custom Camera</string>
+    <!-- end-->
+
+    <!--dialog block-->
+    <string name="cam_confirm">Wanna save this photo?</string>
+    <!--dialog end-->
+
+
+    <string name="btn_cam">Camera</string>
+    <string name="btn_video">Video</string>
+    <string name="btn_custom_cam">Custom Camera</string>
+
+    <!--utils-->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

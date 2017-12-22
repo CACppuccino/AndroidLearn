@@ -3,7 +3,9 @@ package com.example.androidlearn;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
@@ -31,13 +33,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Hide the action bar
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        setView();
+        setListener();
+
     }
 
     @Override
     protected void onStart(){
         super.onStart();
-        setView();
-        setListener();
     }
 
     private void setView(){
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setListener(){
+        // set up the gesture listener
+//        GestureDetector gd = new GestureDetector(MainActivity.this);
         Button search = findViewById(R.id.button);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +63,17 @@ public class MainActivity extends AppCompatActivity {
                 requestForInfo(res,url);
             }
         });
+        // for future gesture detector
+         View whole_layout = findViewById(R.id.layout_main);
+//         whole_layout.set
+        Button btn_back = findViewById(R.id.btn_back);
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
     }
 
     private void requestForInfo(String bid, String url){

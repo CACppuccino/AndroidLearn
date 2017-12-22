@@ -16,12 +16,14 @@ public class WelcomeActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        // turning off the title(action bar) at the top of the screen
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         // hide the status bar
+
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
-        // turning off the title(action bar) at the top of the screen
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         // set the welcome view
         setContentView(R.layout.activity_welcome);
         // set a timer
@@ -33,7 +35,7 @@ public class WelcomeActivity extends Activity {
         @Override
         public void run() {
             Intent in = new Intent().setClass(WelcomeActivity.this,
-                    MainActivity.class)
+                    menu.class)
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(in);
             finish();
